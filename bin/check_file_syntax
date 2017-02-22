@@ -1,0 +1,95 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require 'fileutils'
+require 'colorize'
+
+require_relative '../lib/ruby/check_file_syntax'
+require_relative '../lib/ruby/simple_junit'
+
+
+def show_status (name, success, errors)
+  if success == :passed
+    puts '   OK   '.colorize(:green) + "  #{name}".colorize(:cyan)
+  else
+    puts '  FAIL  '.colorize(:light_yellow).swap + "  #{name}".colorize(:cyan)
+    puts errors
+  end
+end
+
+
+if __FILE__ == $0
+
+  options = { :excludes        => [],
+              :directory       => '.',
+              :junit           => nil,
+              :display_stdout  => true,
+            }
+  OptionParser.new do |opts|
+    opts.banner = <<-EOH
+Usage: #{File.basename $0} [options] [working dir]
+
+Check the syntax of the following file types from the specified working
+directory. If the working directory is not specified, then the current
+working directory is used.
+
+Supported file types: #{(CheckFileSyntax::ALL_CHECKS.each {|t| t.to_s}).join(', ')}
+
+Options:
+EOH
+
+    opts.on('--no-color', '-C', 'Disable text color') do
+      String.disable_colorization
+    end
+
+    opts.on('--exclude DIR', '-x', 'Exclude directory from any syntax checks') do |dir|
+      options[:excludes] << dir
+    end
+
+    opts.on('--junit DIR', '-j', 'Generate JUnit reports and deposit in DIR') do |dir|
+      options[:junit] = dir
+    end
+
+    opts.on('--no-output', '-n', 'Squelch the results on stdout (default to display)') do
+      options[:display_stdout] = false
+    end
+  end.parse!
+
+  # check for an optional directory to
+  if ARGV.count == 1
+    options[:directory] = ARGV[0]
+  end
+
+  test_collection = SimpleJUnit::TestSuiteCollection.instance
+  test_suite = test_collection.create_testsuite('Syntax Checks')
+  CheckFileSyntax.search_for_errors(options[:directory], options[:excludes]) do |path, status, output|
+    unless status.nil?
+      tc = test_suite.create_testcase('File syntax', path)
+      case status
+      when :passed
+        tc.passed(output)
+      when :failed
+        tc.failed('syntax_error', '', output)
+      when :skipped
+        tc.skipped
+      end
+    end
+  end
+
+  if options[:junit]
+    unless Dir.exists? options[:junit]
+      FileUtils.mkdir_p options[:junit]
+      FileUtils.chmod 0755, options[:junit]
+    end
+    File.open("#{options[:junit]}/check_file_syntax-#{$$}.xml", 'w') do |fh|
+      fh.write test_collection.to_s
+    end
+  end
+
+  if options[:display_stdout]
+    test_suite.testcases.each do |tc|
+      show_status(tc.description, tc.status, tc.errors)
+    end
+  end
+
+end

@@ -1,0 +1,61 @@
+---
+# Configuration for syntax checks
+  syntax:
+    run: true
+# checks determines which syntax checkers to use
+#    checks:
+#      - ruby
+#      - erb
+#
+# exclude_dirs is a list of subdirectories to exclude from syntax checks
+    exclude_dirs:
+      - automation
+      - bin
+      - .git
+      - vendor
+      - spec
+#
+# Configuration for lint parsing
+  lint:
+    run: true
+# enable turns on lint parsing options. They are puppet-lint options
+# with '--no-' and '-check' removed from the option. Not specifying
+# enable will cause all options to be turned on.
+    enable:
+      - right_to_left_relationship
+#      - autoloader_layout
+      - names_containing_dash
+      - class_inherits_from_params_class
+      - parameter_order
+      - inherits_across_namespaces
+      - nested_classes_or_defines
+#      - variable_scope
+      - slash_comments
+      - star_comments
+      - selector_inside_resource
+      - case_without_default
+      - documentation
+#      - double_quoted_strings
+      - only_variable_string
+      - variables_not_enclosed
+      - single_quote_string_with_variables
+      - quoted_booleans
+      - puppet_url_without_modules
+      - variable_contains_dash
+      - hard_tabs
+      - trailing_whitespace
+#      - 80chars
+      - 2sp_soft_tabs
+      - arrow_alignment
+      - unquoted_resource_title
+      - ensure_first_param
+      - duplicate_params
+      - unquoted_file_mode
+      - file_mode
+      - ensure_not_symlink_target
+      - unquoted_node_name
+#
+# Configuration for RSpec unit testing
+  rspec:
+    run: true
+    clean_sources: true
