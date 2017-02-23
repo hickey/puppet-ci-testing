@@ -10,7 +10,8 @@ module SimpleJUnit
     attr :testsuites
 
     def initialize
-      @testsuites = []
+      # initialization code needs to be put in reset method for testing
+      self.reset
     end
 
     def create_testsuite(name)
@@ -25,6 +26,12 @@ module SimpleJUnit
 #{(@testsuites.each {|ts| ts.to_s}).join}
 </testsuites>
 EOTC
+    end
+
+    # This is really the initialize method, but for testing we want to be
+    # able to reset the singleton to an initialized state
+    def reset
+      @testsuites = []
     end
   end
 
@@ -46,7 +53,7 @@ EOTC
       end
     end
 
-    def create_testcase(name, desc)
+    def create_testcase(name, desc=nil)
       @testcases << TestCase.new(name, desc)
       @testcases.last
     end
@@ -83,13 +90,13 @@ EOTS
       @output = nil
     end
 
-    def passed(output=nil, errors=nil)
+    def passed(output:nil, error:nil)
       @status = :passed
       unless output.nil?
         @output = output
       end
-      unless errors.nil?
-        @errors = errors
+      unless error.nil?
+        @errors = error
       end
     end
 
@@ -97,14 +104,14 @@ EOTS
       @status == :passed
     end
 
-    def failed(type=nil, output=nil, errors=nil)
+    def failed(type:nil, output:nil, error:nil)
       @status = :failed
       @error_type = type || 'unspecified'
       unless output.nil?
         @output = output
       end
-      unless errors.nil?
-        @errors = errors
+      unless error.nil?
+        @errors = error
       end
     end
 
