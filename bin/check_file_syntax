@@ -68,16 +68,30 @@ EOH
 
   test_collection = SimpleJUnit::TestSuiteCollection.instance
   test_suite = test_collection.create_testsuite('Syntax Checks')
-  CheckFileSyntax.search_all_files_for_errors(options[:directory], options[:excludes]) do |path, status, output|
-    unless status.nil?
-      tc = test_suite.create_testcase('File syntax', path)
-      case status
-      when :passed
-        tc.passed(output: output)
-      when :failed
-        tc.failed(type: 'syntax_error', output: '', error: output)
-      when :skipped
-        tc.skipped
+  
+  if options[:git_hook]
+    deny_commit = false
+    changed_files.each do |changed|
+      CheckFileSyntax::check_file_syntax(changed) do |path, status, errors|
+        if status == :failed
+          deny_commit = true
+        end
+        CheckFileSyntax::show_status(path, status, errors)
+      end
+    end
+    exit(1) if deny_commit
+  else
+    CheckFileSyntax.search_all_files_for_errors(options[:directory], options[:excludes]) do |path, status, output|
+      unless status.nil?
+        tc = test_suite.create_testcase('File syntax', path)
+        case status
+        when :passed
+          tc.passed(output: output)
+        when :failed
+          tc.failed(type: 'syntax_error', output: '', error: output)
+        when :skipped
+          tc.skipped
+        end
       end
     end
   end
