@@ -4,17 +4,18 @@ require 'optparse'
 require 'fileutils'
 require 'colorize'
 
-require_relative '../lib/ruby/check_file_syntax'
-require_relative '../lib/ruby/simple_junit'
+require 'check_file_syntax'
+require 'simple_junit'
 
 
-def show_status (name, success, errors)
-  if success == :passed
-    puts '   OK   '.colorize(:green) + "  #{name}".colorize(:cyan)
-  else
-    puts '  FAIL  '.colorize(:light_yellow).swap + "  #{name}".colorize(:cyan)
-    puts errors
-  end
+
+def repo_directory
+  `git rev-parse --show-toplevel`.chomp
+end
+
+
+def changed_files
+  `git diff --cached --name-only --diff-filter=ACM`.split("\n")
 end
 
 
@@ -24,6 +25,7 @@ if __FILE__ == $0
               :directory       => '.',
               :junit           => nil,
               :display_stdout  => true,
+              :git_hook        => false,
             }
   OptionParser.new do |opts|
     opts.banner = <<-EOH
@@ -53,6 +55,10 @@ EOH
     opts.on('--no-output', '-n', 'Squelch the results on stdout (default to display)') do
       options[:display_stdout] = false
     end
+
+    opts.on('--git-hook', '-g', 'Execute as a Git pre-commit hook') do
+      options[:git_hook] = true
+    end
   end.parse!
 
   # check for an optional directory to
@@ -62,14 +68,14 @@ EOH
 
   test_collection = SimpleJUnit::TestSuiteCollection.instance
   test_suite = test_collection.create_testsuite('Syntax Checks')
-  CheckFileSyntax.search_for_errors(options[:directory], options[:excludes]) do |path, status, output|
+  CheckFileSyntax.search_all_files_for_errors(options[:directory], options[:excludes]) do |path, status, output|
     unless status.nil?
       tc = test_suite.create_testcase('File syntax', path)
       case status
       when :passed
-        tc.passed(output)
+        tc.passed(output: output)
       when :failed
-        tc.failed('syntax_error', '', output)
+        tc.failed(type: 'syntax_error', output: '', error: output)
       when :skipped
         tc.skipped
       end
@@ -88,7 +94,7 @@ EOH
 
   if options[:display_stdout]
     test_suite.testcases.each do |tc|
-      show_status(tc.description, tc.status, tc.errors)
+      CheckFileSyntax.show_status(tc.description, tc.status, tc.errors)
     end
   end
 

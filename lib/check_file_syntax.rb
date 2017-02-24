@@ -24,6 +24,7 @@ module CheckFileSyntax
     return false
   end
 
+  # define a bunch of convenience functions
   def puppet_file?(path)
     type_of_file(path, :puppet, '.pp')
   end
@@ -69,7 +70,7 @@ module CheckFileSyntax
 
 
   module_function
-  def search_for_errors(directory, excludes=[], checks=ALL_CHECKS, &block)
+  def search_all_files_for_errors(directory, excludes=[], checks=ALL_CHECKS, &block)
     error_count = 0
     Find.find(directory) do |path|
       # prune the directory tree if we found a directory that should be excluded
@@ -82,9 +83,18 @@ module CheckFileSyntax
         end
       end
 
-  
-
-    
+      # TODO Need to look at checks to determine if we should do this
+      check_file_syntax(path) do |path, status, errors|
+        if status == :failed
+          error_count += 1
+        end
+        
+        if block_given? 
+          yield path, status, errors
+        else
+          show_status(path, status, errors)
+        end
+      end
     end
     return error_count
   end
