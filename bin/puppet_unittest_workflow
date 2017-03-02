@@ -11,7 +11,7 @@ require 'puppet-lint/tasks/puppet-lint'
 
 require 'puppet-lint'
 
-require_relative '../lib/ruby/check_file_syntax'
+require 'check_file_syntax'
 
 
 PUPPET_DIRS = ['files', 'lib', 'manifest', 'spec', 'templates', 'tests',
@@ -144,8 +144,12 @@ end
 
 if __FILE__ == $0
 
-  CONF_FILE = File.expand_path('../../etc/puppet_unittest_workflow.yaml', $0)
-
+  if ENV['PUPPET_CI_CONF']
+    CONF_FILE = ENV['PUPPET_CI_CONF']
+  else
+    CONF_FILE = File.expand_path('../../etc/puppet_unittest_workflow.yaml', $0)
+  end
+  
   # Set script defaults
   options = OpenStruct.new
   options.syntax_run = true
@@ -218,6 +222,7 @@ if __FILE__ == $0
     opts.separator <<-EOH
 
 Config file: #{CONF_FILE}
+Config file location can be specified by setting $PUPPET_CI_CONF
 
 Default syntax checks: #{options.syntax_checks.map {|i| i.to_s}.join ', '}
 
