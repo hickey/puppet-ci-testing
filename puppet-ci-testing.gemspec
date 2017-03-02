@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.description     = ''
   s.authors         = ["Gerard Hickey"]
   s.email           = 'hickey@kinetic-compute.com'
-  s.add_runtime_dependency 'puppet', '~> 3.7.1'
+  s.add_runtime_dependency 'puppet', '>= 3.2.0'
   s.add_runtime_dependency 'colorize'
   s.add_runtime_dependency 'puppet-lint', '~> 1.1.0'
   s.add_runtime_dependency 'rspec-puppet', '>= 2.0.0'
