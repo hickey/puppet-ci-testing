@@ -142,84 +142,82 @@ end
 
 
 
-if __FILE__ == $0
+if ENV['PUPPET_CI_CONF']
+  CONF_FILE = ENV['PUPPET_CI_CONF']
+else
+  CONF_FILE = File.expand_path('../../etc/puppet_unittest_workflow.yaml', $0)
+end
 
-  if ENV['PUPPET_CI_CONF']
-    CONF_FILE = ENV['PUPPET_CI_CONF']
-  else
-    CONF_FILE = File.expand_path('../../etc/puppet_unittest_workflow.yaml', $0)
-  end
-  
-  # Set script defaults
-  options = OpenStruct.new
-  options.syntax_run = true
-  options.syntax_checks = CheckFileSyntax::ALL_CHECKS
-  options.syntax_exclude_dirs = []
-  options.lint_run = true
-  options.lint_enable = []
-  options.rspec_run = true
-  options.rspec_clean_sources = false
+# Set script defaults
+options = OpenStruct.new
+options.syntax_run = true
+options.syntax_checks = CheckFileSyntax::ALL_CHECKS
+options.syntax_exclude_dirs = []
+options.lint_run = true
+options.lint_enable = []
+options.rspec_run = true
+options.rspec_clean_sources = false
 
 
-  # read in config file and set options
-  defaults = YAML.load_file(CONF_FILE)
-  defaults.keys.each do |test|
-    opts = defaults[test]
+# read in config file and set options
+defaults = YAML.load_file(CONF_FILE)
+defaults.keys.each do |test|
+  opts = defaults[test]
 
-    if test == 'syntax'
-      options.syntax_run = opts['run'] if opts.has_key? 'run'
-      options.syntax_checks = opts['checks'] if opts.has_key? 'checks'
-      options.syntax_exclude_dirs = opts['exclude_dirs'] if opts.has_key? 'exclude_dirs'
-    end
-
-    if test == 'lint'
-      options.lint_run = opts['run'] if opts.has_key? 'run'
-      options.lint_enable = opts['enable'] if opts.has_key? 'enable'
-    end
-
-    if test == 'rspec'
-      options.rspec_run = opts['run'] if opts.has_key? 'run'
-      options.rspec_clean_sources = opts['clean_sources'] if opts.has_key? 'clean_sources'
-    end
-
+  if test == 'syntax'
+    options.syntax_run = opts['run'] if opts.has_key? 'run'
+    options.syntax_checks = opts['checks'] if opts.has_key? 'checks'
+    options.syntax_exclude_dirs = opts['exclude_dirs'] if opts.has_key? 'exclude_dirs'
   end
 
+  if test == 'lint'
+    options.lint_run = opts['run'] if opts.has_key? 'run'
+    options.lint_enable = opts['enable'] if opts.has_key? 'enable'
+  end
 
-  # process the command line options and override prev set settings
-  OptionParser.new do |opts|
-    opts.on('--[no-]lint', "Enable/disable lint parsing (Default: #{options[:lint]})") do |val|
-      options.lint_run = val
+  if test == 'rspec'
+    options.rspec_run = opts['run'] if opts.has_key? 'run'
+    options.rspec_clean_sources = opts['clean_sources'] if opts.has_key? 'clean_sources'
+  end
+
+end
+
+
+# process the command line options and override prev set settings
+OptionParser.new do |opts|
+  opts.on('--[no-]lint', "Enable/disable lint parsing (Default: #{options[:lint]})") do |val|
+    options.lint_run = val
+  end
+
+  opts.on('--disable-syntax-check [TYPE]', 'Disable syntax check for TYPE') do |val|
+    if val.nil? or val =~ /all/i
+      options.syntax_run = false
+    else
+      options.syntax_checks.select! {|type| type != val.to_sym}
     end
+  end
 
-    opts.on('--disable-syntax-check [TYPE]', 'Disable syntax check for TYPE') do |val|
-      if val.nil? or val =~ /all/i
-        options.syntax_run = false
-      else
-        options.syntax_checks.select! {|type| type != val.to_sym}
+  opts.on('--enable-syntax-check [TYPE]', 'Enable syntax checks for TYPE') do |val|
+    if val.nil?
+      options.syntax_checks = CheckFileSyntax::ALL_CHECKS
+    else
+      if not options.syntax_checks.include? val.to_sym
+        options.syntax_checks << val.to_sym
       end
     end
+  end
 
-    opts.on('--enable-syntax-check [TYPE]', 'Enable syntax checks for TYPE') do |val|
-      if val.nil?
-        options.syntax_checks = CheckFileSyntax::ALL_CHECKS
-      else
-        if not options.syntax_checks.include? val.to_sym
-          options.syntax_checks << val.to_sym
-        end
-      end
-    end
-
-    opts.on('--clean-sources', 'Clean out dependent sources and start from scratch') do
-      options.rspec_clean_sources = true
-    end
+  opts.on('--clean-sources', 'Clean out dependent sources and start from scratch') do
+    options.rspec_clean_sources = true
+  end
 
 
-    opts.on('--disable-rspec', 'Disable rspec unittests') do
-      options.rspec_run = false
-    end
+  opts.on('--disable-rspec', 'Disable rspec unittests') do
+    options.rspec_run = false
+  end
 
 
-    opts.separator <<-EOH
+  opts.separator <<-EOH
 
 Config file: #{CONF_FILE}
 Config file location can be specified by setting $PUPPET_CI_CONF
@@ -232,24 +230,24 @@ disable switch at the end of options will turn off all syntax checks
 even if there are enable syntax check switches on the command line.
 EOH
 
-  end.parse!
+end.parse!
 
 
-  if options.syntax_run
-    unless process_syntax_checks(options)
-      exit(1)
-    end
-  end
-
-
-  if options.lint_run
-    unless process_lint_parsing(options)
-      exit(2)
-    end
-  end
-
-
-  if options.rspec_run
-    process_rspec_tests(options)
+if options.syntax_run
+  unless process_syntax_checks(options)
+    exit(1)
   end
 end
+
+
+if options.lint_run
+  unless process_lint_parsing(options)
+    exit(2)
+  end
+end
+
+
+if options.rspec_run
+  process_rspec_tests(options)
+end
+

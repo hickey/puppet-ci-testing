@@ -36,7 +36,9 @@ The check_file_syntax script will check the syntax of the following types of fil
 
 ## puppet_unittest_workflow Usage
 
-The puppet_unittest_workflow script is used to integrate 
+The puppet_unittest_workflow script is used to integrate the testing of a Puppet module in a CI 
+environment such as Jenkins or Atlassian Bamboo. JUnit reports will be generated for the
+RSpec and Server-Spec testing and will be deposited in the test-reports subdirectory.
 
 
 ````
