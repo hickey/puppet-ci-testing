@@ -5,7 +5,9 @@ require 'rspec/core/rake_task'
 #task :spec    => ['spec:all']
 task :default => [:spec]
 
-RakeVersion::Tasks.new
+RakeVersion::Tasks.new do |v|
+  v.copy 'puppet-ci-testing.gemspec'
+end
 
 desc 'Run the spec tests.'
 RSpec::Core::RakeTask.new do |t|
