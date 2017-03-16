@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name            = 'puppet-ci-testing'
-  s.version         = '0.9.2'
+  s.version         = '0.9.3'
   s.date            = '2016-01-17'
   s.summary         = ''
   s.description     = ''

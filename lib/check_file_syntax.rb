@@ -88,8 +88,8 @@ module CheckFileSyntax
         if status == :failed
           error_count += 1
         end
-        
-        if block_given? 
+
+        if block_given?
           yield path, status, errors
         else
           show_status(path, status, errors)
@@ -108,6 +108,7 @@ module CheckFileSyntax
     if puppet_file? path
       if system('which puppet >/dev/null')
         errors = `puppet parser validate #{path} 2>&1`
+        status = $?.success? ? :passed : :failed
       else
         puts 'Consider installing puppet so that syntax can be checked.'.colorize(:yellow)
         status = :skipped
