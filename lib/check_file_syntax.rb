@@ -60,11 +60,14 @@ module CheckFileSyntax
 
   module_function
   def show_status (name, success, errors)
-    if success == :passed
-      puts '   OK   '.colorize(:green) + "  #{name}".colorize(:cyan)
-    else
-      puts '  FAIL  '.colorize(:light_yellow).swap + "  #{name}".colorize(:cyan)
-      puts errors
+    # Untested files return a nil success
+    unless success.nil?
+      if success == :passed
+        puts '   OK   '.colorize(:green) + "  #{name}".colorize(:cyan)
+      else
+        puts '  FAIL  '.colorize(:light_yellow).swap + "  #{name}".colorize(:cyan)
+        puts errors
+      end
     end
   end
 

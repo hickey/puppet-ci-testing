@@ -39,7 +39,7 @@ def process_syntax_checks(opts)
 
 EOM
 
-  num = CheckFileSyntax.search_for_errors('.', excludes=exclude_dirs,
+  num = CheckFileSyntax.search_all_files_for_errors('.', excludes=exclude_dirs,
                                           checks=opts.syntax_checks)
 
   if num > 0
