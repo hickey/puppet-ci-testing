@@ -44,18 +44,13 @@ when you break puppet). It really saves from committing broken Puppet code and t
 takes to detect that puppet is not applying catalogs and to track down where in the code base
 the syntax error has been introduced. 
 
-To create the Git hook, one simply needs to create file <module>/.git/hooks/pre-commit as an
-executable (i.e. chmod 755) with the following content:
+To create the Git hook, one simply needs to execute 'check_file_syntax --init'. This command
+will create the pre-commit hook if it does not exist. If one already exists, it will need to be 
+removed or one can manually add the following line to .git/hooks/pre-commit.
 
 ````
-check_file_syntax --git-hook || (echo "^[[1m^[[31mpuppet-ci-testing gem is not installed^[[0m" && exit 1)
+check_file_syntax --git-hook || (echo 'puppet-ci-testing gem is not installed' && exit 1)
 ````
- 
-All that is really needed is the first half (up to the double pipe). The second half will alert you 
-that the puppet-ci-testing gem is not installed and fail the commit attempt. It should be also 
-noted that the ^[ are actual escape control codes (i.e. 0x1B). In most editors these can be 
-entered by pressing control-V followed by control-[. You could leave the echoed text as 
-"puppet-ci-testing gem is not installed" and get the non-colorized text. 
 
 ## puppet_unittest_workflow Usage
 
