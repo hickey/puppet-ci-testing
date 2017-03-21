@@ -58,6 +58,34 @@ EOH
   opts.on('--git-hook', '-g', 'Execute as a Git pre-commit hook') do
     options[:git_hook] = true
   end
+  
+  opts.on('--initialize', '--init', '-I', 'Setup Git pre-commit hook') do
+    # insure that we see the .git directory
+    unless Dir.exists? '.git'
+      puts "Not able to locate Git hooks directory."
+      puts "Please rerun the command at the top of the Git directory tree."
+      exit 1
+    end
+    
+    # insure that the hooks directory exists
+    unless Dir.exists? '.git/hooks'
+      FileUtils.mkdir '.git/hooks', :mode => 0755
+    end
+    
+    # Now create the pre-commit file unless it exists
+    if File.exists? '.git/hooks/pre-commit'
+      puts "The Git pre-commit hook already exists (.git/hooks/pre-commit)."
+      puts "Please remove this file and rerun the command to create the pre-commit hook."
+      exit 1
+    end
+    
+    open('.git/hooks/pre-commit', 'w') do |fp|
+      fp.puts "check_file_syntax --git-hook || (echo "[1m[31mpuppet-ci-testing gem is not installed[0m" && exit 1)"
+    end
+    FileUtils.chmod 0755, '.git/hooks/pre-commit'
+    exit 0
+  end
+  
 end.parse!
 
 # check for an optional directory to

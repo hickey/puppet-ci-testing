@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name            = 'puppet-ci-testing'
-  s.version         = '0.11.0'
+  s.version         = '0.12.0'
   s.date            = '2016-01-17'
   s.summary         = ''
   s.description     = ''
@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rake', '~> 11.3.0'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'rake-version', '~> 1.0'
+  s.add_development_dependency 'fakefs', '~> 0.10.0'
   s.files           = `git ls-files -- {lib,etc,spec}`.split("\n")
   s.executables     = ['check_file_syntax', 'puppet_unittest_workflow']
   s.homepage        = 'https://github.com/hickey/puppet-ci-testing/'

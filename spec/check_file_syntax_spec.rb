@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'check_file_syntax'
 
-describe 'CheckFileSyntax' do
+describe CheckFileSyntax do
   
   { :json   =>  '.json', 
     :yaml   =>  ['.yaml','.yml'],
@@ -66,6 +66,5 @@ describe 'CheckFileSyntax' do
       File.unlink filename
     end
   end
-  
   
 end

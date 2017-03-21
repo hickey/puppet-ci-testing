@@ -25,6 +25,7 @@ Options:
     -j, --junit DIR                  Generate JUnit reports and deposit in DIR
     -n, --no-output                  Squelch the results on stdout (default to display)
     -g, --git-hook                   Execute as a Git pre-commit hook
+    -I, --initialize, --init         Setup Git pre-commit hook
 ````
 
 The check_file_syntax script will check the syntax of the following types of files:
