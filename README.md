@@ -1,5 +1,5 @@
 [![Gem Version](https://badge.fury.io/rb/puppet-ci-testing.svg)](https://badge.fury.io/rb/puppet-ci-testing)
-[![Build Status](https://travis-ci.org/hickey/puppet-ci-testing.svg?branch=master)](https://travis-ci.org/hickey/puppet-ci-testing.svg?branch=master)
+[![Build Status](https://travis-ci.org/hickey/puppet-ci-testing.svg?branch=master)](https://travis-ci.org/hickey/puppet-ci-testing)
 
 # puppet-ci-testing
 Ruby GEM that checks the syntax of multiple file types and integrates a number of Puppet
