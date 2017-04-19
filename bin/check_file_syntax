@@ -80,7 +80,7 @@ EOH
     end
     
     open('.git/hooks/pre-commit', 'w') do |fp|
-      fp.puts "check_file_syntax --git-hook || (echo '[1m[31mpuppet-ci-testing gem is not installed[0m' && exit 1)"
+      fp.puts "#{$0} --git-hook || (echo '[1m[31mpuppet-ci-testing gem is not installed[0m' && exit 1)"
     end
     FileUtils.chmod 0755, '.git/hooks/pre-commit'
     exit 0
