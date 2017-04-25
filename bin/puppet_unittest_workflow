@@ -71,7 +71,7 @@ def process_lint_parsing(opts)
 ========================================================================
 ========================================================================
 
-  Performaning lint parsing
+  Performing lint parsing
 
     Enabled lint options:
           #{enables.join("\n          ")}
@@ -85,7 +85,7 @@ EOM
     Rake::Task['lint'].clear
     PuppetLint::RakeTask.new :lint do |config|
       config.ignore_paths = ['spec/**/*.pp', 'vendor/**/*.pp']
-      config.log_format = '%{path}:%{linenumber}:%{check}:%{KIND}:%{message}'
+      config.log_format = "%{path}:%{linenumber}:%{check}:%{KIND}:%{message}"
       config.fail_on_warnings = false
       config.disable_checks = disables
     end
@@ -98,7 +98,7 @@ EOM
 
 ************************************************************************
 
-                            BUILD HAD FAILED
+                            BUILD HAS FAILED
 
              Correct the above Puppet LINT errors to correct
 
