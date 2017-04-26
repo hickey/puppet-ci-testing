@@ -136,6 +136,7 @@ EOM
     task.rspec_opts = %w[--format RspecJunitFormatter --out test-reports/rspec.xml]
     task.pattern = 'spec/{classes,defines,unit,functions,hosts,integration}/**/*_spec.rb'
   end
+  Rake.application['spec_prep'].invoke
   Rake.application['spec'].invoke
 end
 
