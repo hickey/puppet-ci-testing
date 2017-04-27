@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name            = 'puppet-ci-testing'
   s.version         = '0.12.6.pre'
-  s.date            = '2016-01-17'
+  s.date            = '2016-04-27'
   s.summary         = ''
   s.description     = ''
   s.authors         = ["Gerard Hickey"]
