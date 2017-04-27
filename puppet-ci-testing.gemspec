@@ -18,7 +18,9 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'rake-version', '~> 1.0'
   s.add_development_dependency 'fakefs', '~> 0.10.0'
-  s.files           = `git ls-files -- {lib,etc,spec}`.split("\n")
+  s.platform        = Gem::Platform::RUBY
+  s.require_paths   = [ '.' ]
+  s.files           = Dir['lib/*'] + Dir['etc/*'] + Dir['spec/*']
   s.executables     = ['check_file_syntax', 'puppet_unittest_workflow']
   s.homepage        = 'https://github.com/hickey/puppet-ci-testing/'
 end
