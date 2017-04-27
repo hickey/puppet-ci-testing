@@ -130,8 +130,10 @@ EOM
     puts "***   Cleaning spec fixtures"
     puts "***"
     Rake.application['spec_clean'].invoke
+    puts "*** spec_clean complete"
   end
 
+  puts "**** setting up for JUnit reports"
   RSpec::Core::RakeTask.new(:spec) do |task|
     task.rspec_opts = %w[--format RspecJunitFormatter --out test-reports/rspec.xml]
     task.pattern = 'spec/{classes,defines,unit,functions,hosts,integration}/**/*_spec.rb'
