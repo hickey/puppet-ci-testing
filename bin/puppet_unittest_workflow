@@ -139,7 +139,13 @@ EOM
   puts "**** Executing spec_prep ****"
   Rake.application['spec_prep'].invoke
   puts "**** Executing spec ****"
-  Rake.application['spec'].invoke
+  begin
+    result = Rake.application['spec'].invoke
+    puts "rake result = #{result.inspect}"
+  rescue Exception => e
+    puts "Exception from spec invocation: #{e.inspect}"
+  end
+  
 end
 
 
