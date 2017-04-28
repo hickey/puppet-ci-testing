@@ -17,8 +17,10 @@ require 'check_file_syntax'
 PUPPET_DIRS = ['files', 'lib', 'manifest', 'spec', 'templates', 'tests',
                '.git_hooks']
 
-
-def create_fixtures_yaml
+# .fixtures.yml file is how the RSpec testing pulls in dependent
+# puppet modules. We are able to generate it from the dependency
+# information specified in the metadata.json file.
+def create_fixtures_yml
   metadata = JSON.parse(File.read('metadata.json'))
   File.open('.fixtures.yml', 'w') do |fix|
     fix.puts "fixtures:"
@@ -30,7 +32,7 @@ def create_fixtures_yaml
         if dep.key? 'version_requirement'
           fix.puts "    #{(dep['name'].split(/[\/\-]/))[-1]}:"
           fix.puts "      repo: \"#{dep['name']}\""
-         fix.puts "      ref: \"#{dep['version_requirement'].gsub(/[=\<\>~\s]/, '')}\""
+          fix.puts "      ref: \"#{dep['version_requirement'].gsub(/[=\<\>~\s]/, '')}\""
         else
           fix.puts "    #{(dep['name'].split(/\/\-/))[1]}: \"#{dep['name']}\""
         end
@@ -52,7 +54,7 @@ def process_syntax_checks(opts)
 ========================================================================
 ========================================================================
 
-  Performaning syntax checks
+  Performing syntax checks
 
     File types:  #{opts.syntax_checks.map {|i| i.to_s}.join(', ')}
     Directories: #{checked_dirs.join(', ')}
@@ -114,6 +116,7 @@ EOM
   end
 
   begin
+    # TODO: gather lint output and generate JUnit reports
     Rake.application['lint'].invoke
   rescue SystemExit => e
     puts <<-EOM
@@ -152,26 +155,18 @@ EOM
     puts "***   Cleaning spec fixtures"
     puts "***"
     Rake.application['spec_clean'].invoke
-    puts "*** spec_clean complete"
   end
 
-  puts "**** setting up for JUnit reports"
+  # Add a spec job to generate JUnit reports
   RSpec::Core::RakeTask.new(:spec) do |task|
     task.rspec_opts = %w[--format RspecJunitFormatter --out test-reports/rspec.xml]
     task.pattern = 'spec/{classes,defines,unit,functions,hosts,integration}/**/*_spec.rb'
   end
-  
-  create_fixtures_yaml
-  begin
-    result = Rake.application['spec'].invoke
-    puts "rake result = #{result.inspect}"
-  rescue Exception => e
-    puts "Exception from spec invocation: #{e.inspect}"
-  end
-  
+
+  # we need a .fixtures.yml file to pull in dependent modules
+  create_fixtures_yml
+  Rake.application['spec'].invoke
 end
-
-
 
 
 if ENV['PUPPET_CI_CONF']

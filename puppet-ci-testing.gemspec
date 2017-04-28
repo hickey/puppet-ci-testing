@@ -1,13 +1,13 @@
 Gem::Specification.new do |s|
   s.name            = 'puppet-ci-testing'
-  s.version         = '0.12.6.pre'
-  s.date            = '2016-04-27'
+  s.version         = '0.12.6'
+  s.date            = '2016-04-28'
   s.summary         = ''
   s.description     = ''
   s.authors         = ["Gerard Hickey"]
   s.email           = 'hickey@kinetic-compute.com'
   s.add_runtime_dependency 'puppet', '>= 3.2.0'
-  s.add_runtime_dependency 'colorize'
+  s.add_runtime_dependency 'colorize', '~> 0.8.0'
   s.add_runtime_dependency 'puppet-lint', '>= 1.1.0'
   s.add_runtime_dependency 'rspec-puppet', '>= 2.0.0'
   s.add_runtime_dependency 'rspec-puppet-utils', '>= 3.1.0'
@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'deep_merge'
   s.add_runtime_dependency 'rspec_junit_formatter'
   s.add_development_dependency 'rake', '~> 11.3.0'
-  s.add_development_dependency 'rspec'
+  s.add_development_dependency 'rspec', '>= 3.5.0'
   s.add_development_dependency 'rake-version', '~> 1.0'
   s.add_development_dependency 'fakefs', '~> 0.10.0'
   s.platform        = Gem::Platform::RUBY
