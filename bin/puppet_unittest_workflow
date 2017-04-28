@@ -18,6 +18,28 @@ PUPPET_DIRS = ['files', 'lib', 'manifest', 'spec', 'templates', 'tests',
                '.git_hooks']
 
 
+def create_fixtures_yaml
+  metadata = JSON.parse(File.read('metadata.json'))
+  File.open('.fixtures.yml', 'w') do |fix|
+    fix.puts "fixtures:"
+    fix.puts "  symlinks:"
+    fix.puts "    #{(metadata['name'].split(/[\/\-]/))[-1]}: \"\#{source_dir}\""
+    if metadata.key? 'dependencies'
+      fix.puts "  forge_modules:"
+      metadata['dependencies'].each do |dep|
+        if dep.key? 'version_requirement'
+          fix.puts "    #{(dep['name'].split(/[\/\-]/))[-1]}:"
+          fix.puts "      repo: \"#{dep['name']}\""
+         fix.puts "      ref: \"#{dep['version_requirement'].gsub(/[=\<\>~\s]/, '')}\""
+        else
+          fix.puts "    #{(dep['name'].split(/\/\-/))[1]}: \"#{dep['name']}\""
+        end
+      end
+    end
+  end
+end
+
+
 def process_syntax_checks(opts)
   # collect all the current directories
   dirs = Dir.entries('.').select {|item| File.directory? item and item !~ /^\.{1,2}$/}
@@ -138,8 +160,8 @@ EOM
     task.rspec_opts = %w[--format RspecJunitFormatter --out test-reports/rspec.xml]
     task.pattern = 'spec/{classes,defines,unit,functions,hosts,integration}/**/*_spec.rb'
   end
-  puts "**** executing spec_fixture ****"
-  Rake.application['spec_fixtures'].invoke
+  
+  create_fixtures_yaml
   puts "**** Executing spec_prep ****"
   Rake.application['spec_prep'].invoke
   puts "**** Executing spec ****"
