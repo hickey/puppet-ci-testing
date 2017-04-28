@@ -138,11 +138,13 @@ EOM
     task.rspec_opts = %w[--format RspecJunitFormatter --out test-reports/rspec.xml]
     task.pattern = 'spec/{classes,defines,unit,functions,hosts,integration}/**/*_spec.rb'
   end
+  puts "**** executing spec_fixture ****"
+  Rake.application['spec_fixtures'].invoke
   puts "**** Executing spec_prep ****"
   Rake.application['spec_prep'].invoke
   puts "**** Executing spec ****"
   begin
-    result = Rake.application['spec'].invoke
+    result = Rake.application['spec_standalone'].invoke
     puts "rake result = #{result.inspect}"
   rescue Exception => e
     puts "Exception from spec invocation: #{e.inspect}"
