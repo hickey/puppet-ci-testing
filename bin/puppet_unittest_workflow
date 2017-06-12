@@ -109,7 +109,7 @@ EOM
     Rake::Task['lint'].clear
     PuppetLint::RakeTask.new :lint do |config|
       config.ignore_paths = ['spec/**/*.pp', 'vendor/**/*.pp']
-      config.log_format = "%{path}:%{linenumber}:%{check}:%{KIND}:%{message}"
+      config.log_format = '%{path}:%{linenumber}:%{check}:%{KIND}:%{message}'
       config.fail_on_warnings = false
       config.disable_checks = disables
     end

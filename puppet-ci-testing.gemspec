@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name            = 'puppet-ci-testing'
-  s.version         = '0.13.0'
+  s.version         = '0.13.1'
   s.date            = '2016-04-28'
   s.summary         = 'Utilities to perform Puppet testing in a CI workflow'
   s.description     = 'Create an end to end CI workflow for integrating Puppet module testing and publication.'
