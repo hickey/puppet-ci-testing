@@ -32,9 +32,9 @@ def create_fixtures_yml
         if dep.key? 'version_requirement'
           fix.puts "    #{(dep['name'].split(/[\/\-]/))[-1]}:"
           fix.puts "      repo: \"#{dep['name']}\""
-          fix.puts "      ref: \"#{dep['version_requirement'].gsub(/[=\<\>~\s]/, '')}\""
+          fix.puts "      ref: \"#{dep['version_requirement'].gsub(/[=\<\>~\s]+([\d\.]+).*$/, '\1')}\""
         else
-          fix.puts "    #{(dep['name'].split(/\/\-/))[1]}: \"#{dep['name']}\""
+          fix.puts "    #{(dep['name'].split(/\/\-/))[-1]}: \"#{dep['name']}\""
         end
       end
     end
