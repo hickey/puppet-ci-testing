@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name            = 'puppet-ci-testing'
-  s.version         = '0.13.1'
-  s.date            = '2016-04-28'
+  s.version         = '0.14.0'
+  s.date            = '2017-08-10'
   s.summary         = 'Utilities to perform Puppet testing in a CI workflow'
   s.description     = 'Create an end to end CI workflow for integrating Puppet module testing and publication.'
   s.authors         = ["Gerard Hickey"]
@@ -14,6 +14,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'puppetlabs_spec_helper', '>= 0.8.0'
   s.add_runtime_dependency 'deep_merge'
   s.add_runtime_dependency 'rspec_junit_formatter'
+  s.add_runtime_dependency 'metadata-json-lint', '~> 2.0.2'
   s.add_development_dependency 'rake', '~> 11.3.0'
   s.add_development_dependency 'rspec', '>= 3.5.0'
   s.add_development_dependency 'rake-version', '~> 1.0'
