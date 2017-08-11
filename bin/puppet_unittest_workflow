@@ -89,7 +89,7 @@ end
 def process_puppet_lint_parsing(opts)
 
   all_checks = PuppetLint.configuration.checks.map {|chk| chk.to_s}
-  enables = opts.puppet_lint_enable || all_checks
+  enables = opts.puppet_lint_enable.empty? ? all_checks : opts.puppet_lint_enable
   disables = all_checks - enables
 
   puts <<-EOM
@@ -141,7 +141,7 @@ end
 def process_metadata_lint_parsing(opts)
 
   all_checks = MetadataJsonLint.options.members.select {|check| check.to_s if check != :format }
-  enables = opts.metadata_lint_enable || all_checks
+  enables = opts.metadata_lint_enable.empty? ? all_checks : opts.metadata_lint_enable
   disables = all_checks - enables
 
   puts <<-EOM
@@ -159,17 +159,12 @@ def process_metadata_lint_parsing(opts)
 EOM
 
   # configure the rake task to disable specific checks
-  if not disables.empty?
-    Rake::Task['lint'].clear
-    MetadataJsonLint::RakeTask.new :lint do |config|
-      enables.each {|check| config[check] = true }
-      disables.each {|check| config[check] = false }
-    end
-  end
+  enables.each {|check| MetadataJsonLint.options[check] = true }
+  disables.each {|check| MetadataJsonLint.options[check] = false}
 
   begin
     # TODO: gather lint output and generate JUnit reports
-    Rake.application['lint'].invoke
+    Rake.application['metadata_lint'].invoke
   rescue SystemExit => e
     puts <<-EOM
 

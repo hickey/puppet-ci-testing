@@ -62,6 +62,7 @@
 #      - strict-dependencies
       - strict-license
       - fail-on-warnings
+#
 # Configuration for RSpec unit testing
   rspec:
     run: true
