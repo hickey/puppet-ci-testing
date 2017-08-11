@@ -59,9 +59,9 @@
   metadata_lint:
     run: true
     enable:
-#      - strict-dependencies
-      - strict-license
-      - fail-on-warnings
+#      - strict_dependencies
+      - strict_license
+      - fail_on_warnings
 #
 # Configuration for RSpec unit testing
   rspec:
