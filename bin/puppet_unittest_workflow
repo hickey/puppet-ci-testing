@@ -84,10 +84,10 @@ EOM
 end
 
 
-def process_lint_parsing(opts)
+def process_puppet_lint_parsing(opts)
 
   all_checks = PuppetLint.configuration.checks.map {|chk| chk.to_s}
-  enables = opts.lint_enable || all_checks
+  enables = opts.puppet_lint_enable || all_checks
   disables = all_checks - enables
 
   puts <<-EOM
@@ -95,7 +95,7 @@ def process_lint_parsing(opts)
 ========================================================================
 ========================================================================
 
-  Performing lint parsing
+  Performing puppet manifest lint parsing
 
     Enabled lint options:
           #{enables.join("\n          ")}
@@ -126,6 +126,56 @@ EOM
                             BUILD HAS FAILED
 
              Correct the above Puppet LINT errors to correct
+
+************************************************************************
+
+EOM
+    return false
+  end
+  return true
+end
+
+
+def process_metadata_lint_parsing(opts)
+
+  all_checks = MetadataJsonLint.options.members.select {|check| check.to_s if check != :format }
+  enables = opts.metadata_lint_enable || all_checks
+  disables = all_checks - enables
+
+  puts <<-EOM
+
+========================================================================
+========================================================================
+
+  Performing metadata.json lint parsing
+
+    Enabled lint options:
+          #{enables.join("\n          ")}
+
+************************************************************************
+
+EOM
+
+  # configure the rake task to disable specific checks
+  if not disables.empty?
+    Rake::Task['lint'].clear
+    MetadataJsonLint::RakeTask.new :lint do |config|
+      enables.each {|check| config[check] = true }
+      disables.each {|check| config[check] = false }
+    end
+  end
+
+  begin
+    # TODO: gather lint output and generate JUnit reports
+    Rake.application['lint'].invoke
+  rescue SystemExit => e
+    puts <<-EOM
+
+************************************************************************
+
+                            BUILD HAS FAILED
+
+             Correct the above metadata.json LINT errors to correct
 
 ************************************************************************
 
@@ -180,29 +230,36 @@ options = OpenStruct.new
 options.syntax_run = true
 options.syntax_checks = CheckFileSyntax::ALL_CHECKS
 options.syntax_exclude_dirs = []
-options.lint_run = true
-options.lint_enable = []
+options.puppet_lint_run = true
+options.puppet_lint_enable = []
+options.metadata_lint_run = true
+options.metadata_lint_enable = []
 options.rspec_run = true
 options.rspec_clean_sources = false
 
 
 # read in config file and set options
 defaults = YAML.load_file(CONF_FILE)
-defaults.keys.each do |test|
-  opts = defaults[test]
+defaults.keys.each do |test_type|
+  opts = defaults[test_type]
 
-  if test == 'syntax'
+  if test_type == 'syntax'
     options.syntax_run = opts['run'] if opts.has_key? 'run'
     options.syntax_checks = opts['checks'] if opts.has_key? 'checks'
     options.syntax_exclude_dirs = opts['exclude_dirs'] if opts.has_key? 'exclude_dirs'
   end
 
-  if test == 'lint'
-    options.lint_run = opts['run'] if opts.has_key? 'run'
-    options.lint_enable = opts['enable'] if opts.has_key? 'enable'
+  if test_type == 'puppet_lint'
+    options.puppet_lint_run = opts['run'] if opts.has_key? 'run'
+    options.puppet_lint_enable = opts['enable'] if opts.has_key? 'enable'
   end
 
-  if test == 'rspec'
+  if test_type == 'metadata_lint'
+    options.metadata_lint_run = opts['run'] if opts.has_key? 'run'
+    options.metadata_lint_enable = opts['enable'] if opts.has_key? 'enable'
+  end
+
+  if test_type == 'rspec'
     options.rspec_run = opts['run'] if opts.has_key? 'run'
     options.rspec_clean_sources = opts['clean_sources'] if opts.has_key? 'clean_sources'
   end
@@ -212,8 +269,9 @@ end
 
 # process the command line options and override prev set settings
 OptionParser.new do |opts|
-  opts.on('--[no-]lint', "Enable/disable lint parsing (Default: #{options[:lint]})") do |val|
-    options.lint_run = val
+  opts.on('--[no-]lint', "Enable/disable lint parsing (Default: #{options[:puppet_lint_run]})") do |val|
+    options.puppet_lint_run = val
+    options.metadata_lint_run = val
   end
 
   opts.on('--disable-syntax-check [TYPE]', 'Disable syntax check for TYPE') do |val|
@@ -267,12 +325,17 @@ if options.syntax_run
 end
 
 
-if options.lint_run
-  unless process_lint_parsing(options)
+if options.puppet_lint_run
+  unless process_puppet_lint_parsing(options)
     exit(2)
   end
 end
 
+if options.metadata_lint_run
+  unless process_metadata_lint_parsing(options)
+    exit(2)
+  end
+end
 
 if options.rspec_run
   process_rspec_tests(options)
