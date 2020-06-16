@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'deep_merge'
   s.add_runtime_dependency 'rspec_junit_formatter'
   s.add_runtime_dependency 'metadata-json-lint', '~> 2.0.2'
-  s.add_development_dependency 'rake', '~> 11.3.0'
+  s.add_development_dependency 'rake', '>= 12.3.3'
   s.add_development_dependency 'rspec', '>= 3.5.0'
   s.add_development_dependency 'rake-version', '~> 1.0'
   s.add_development_dependency 'fakefs', '~> 0.10.0'
