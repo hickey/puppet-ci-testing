@@ -38,7 +38,7 @@ module CheckFileSyntax
   end
 
   def ruby_file?(path)
-    type_of_file(path, :ruby, '.rb')
+    type_of_file(path, :ruby, ['.rb', '.rake'])
   end
 
   def perl_file?(path)
